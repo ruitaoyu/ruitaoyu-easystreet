@@ -1,0 +1,105 @@
+/*
+ * TCSS 305 Assignment 3 - Easy Street
+ */
+package model;
+
+import java.util.ArrayList;
+import java.util.Map;
+
+/**
+ * This is the Bicycle class that extended from the AbstractVehivle class.
+ * 
+ * @author Ruitao YU
+ * @version October 18 2017
+ *
+ */
+public class Bicycle extends AbstractVehicle {
+    
+    /** Death time of the vehicle. */
+    public static final int MY_TIME = 30;
+    
+    /**
+    * This is the constructor of the Bicycle class.
+    * 
+    * @param theX the x coordinate of the vehicle's location.
+    * @param theY the y coordinate of the vehicle's location.
+    * @param theDir the current direction of the vehicle.
+    */
+    public Bicycle(final int theX, final int theY, final Direction theDir) {
+        super(theX, theY, theDir, MY_TIME);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * This is the canPass method that inherit from the AbstractVehicle class that
+     * check whether the terrain of the vehicle facing is movable or not.
+     * 
+     * @param theTerrain The terrain the vehicle is facing.
+     * @param theLight The current light color.
+     * @return whether or not this vehicle is facing a certain terrains and lights. 
+     */
+    @Override
+    public boolean canPass(final Terrain theTerrain, final Light theLight) {
+        final boolean pass;
+        
+        // If the terrain is cross walk, street, light or trail with green light
+        // the bicycle will pass
+        if ((theTerrain == Terrain.CROSSWALK && theLight == Light.GREEN)
+            || theTerrain == Terrain.STREET 
+            || (theTerrain == Terrain.LIGHT && theLight == Light.GREEN)
+            || theTerrain == Terrain.TRAIL) {
+            pass = true;
+        } else {
+            pass = false;
+        }
+        return pass;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * This is the chooseDrection method that inherit from the AbstractVehivle class,
+     * it decide what direction the vehicle will go next.
+     * 
+     * @param theNeighbors The map of neighboring terrain.
+     * @return the direction this vehicle will move to.
+     */
+    @Override
+    public Direction chooseDirection(final Map<Direction, Terrain> theNeighbors) {
+        
+        // Make a list to store the prefer directions
+        // set the direction to reverse in case there is 
+        // no direction in the list
+        final ArrayList<Direction> list = new ArrayList<Direction>();
+        Direction result = getDirection().reverse();
+        
+        // For each map key
+        for (final Direction direction : theNeighbors.keySet()) {
+            
+            // If the terrain is trail and it is not reverse direction
+            // change to direction to face the tral
+            if (theNeighbors.get(direction) == Terrain.TRAIL
+                            && direction != getDirection().reverse()) {
+                result = direction;
+                return result;
+            } else if (theNeighbors.get(direction) != Terrain.GRASS 
+                              &&  theNeighbors.get(direction) != Terrain.WALL) {
+                // If it is not grass and wall, add to the list
+                list.add(direction);            
+            }
+        }
+        
+        // Prefer straight, then left, then right, otherwise, reverse.
+        if (list.contains(getDirection())) {
+            result = getDirection();
+        } else if (list.contains(getDirection().left())) {
+            result = getDirection().left();
+        } else if (list.contains(getDirection().right())) {
+            result = getDirection().right();
+        }
+        return result;
+  
+    }
+
+}

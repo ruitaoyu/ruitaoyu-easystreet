@@ -1,0 +1,73 @@
+package model;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Random;
+
+public class Human extends AbstractVehicle {
+    
+    /** Death time of the truck. */
+
+    public static final int MY_TIME = 50;
+    /**
+     * 
+     * @param theX 
+     * @param theY 
+     * @param theDir 
+     */
+    public Human(final int theX, final int theY, final Direction theDir) {
+        super(theX, theY, theDir, MY_TIME);
+    }
+    
+    @Override
+    public boolean canPass(final Terrain theTerrain, final Light theLight) {
+        final boolean pass;
+        if ((theTerrain == Terrain.CROSSWALK && theLight != Light.GREEN)
+                        || theTerrain == Terrain.GRASS) {
+            pass = true;
+        } else {
+            pass = false;
+        }
+        return pass;
+    }
+    
+    @Override
+    public Direction chooseDirection(final Map<Direction, Terrain> theNeighbors) {
+        Direction dir;
+        final ArrayList<Direction> list;
+        list = available(theNeighbors);
+        if (list.size() != 0) {
+            final Random rand = new Random();
+            final int num = rand.nextInt(list.size());
+            dir = list.get(num);
+        } else {
+            dir = getDirection().reverse();
+        }
+        
+        for (Direction direct : theNeighbors.keySet()) {
+            if (theNeighbors.get(direct) == Terrain.CROSSWALK  
+                            && direct != getDirection().reverse()) {
+                dir = direct;
+                break;
+            }
+        }
+        return dir;
+    }
+    
+    public ArrayList<Direction> available(final Map<Direction, Terrain> theNeighbors) {
+        final ArrayList<Direction> list = new ArrayList<Direction>();
+        
+        for (Direction dir : theNeighbors.keySet()) {
+            if (theNeighbors.get(dir) == Terrain.CROSSWALK 
+                            || theNeighbors.get(dir) == Terrain.GRASS) {
+                if (dir != getDirection().reverse()) {
+                    list.add(dir);
+                }
+
+            }
+        }
+        return list;
+        
+    }
+
+}

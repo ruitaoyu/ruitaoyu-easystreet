@@ -1,0 +1,91 @@
+package model;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Random;
+
+public class Bicycle extends AbstractVehicle {
+    
+    /** Death time of the truck. */
+    public static final int MY_TIME = 30;
+
+    public Bicycle(int theX, int theY, Direction theDir) {
+        super(theX, theY, theDir, MY_TIME);
+    }
+    
+    @Override
+    public boolean canPass(final Terrain theTerrain, final Light theLight) {
+        final boolean pass;
+        if ((theTerrain == Terrain.CROSSWALK && theLight == Light.GREEN)
+            || theTerrain == Terrain.STREET 
+            || (theTerrain == Terrain.LIGHT && theLight == Light.GREEN)
+            || theTerrain == Terrain.TRAIL) {
+            pass = true;
+        } else {
+            pass = false;
+        }
+        return pass;
+    }
+    
+    @Override
+    public Direction chooseDirection(final Map<Direction, Terrain> theNeighbors) {
+        
+        Direction dir;
+        final ArrayList<Direction> list;
+          
+        list = available(theNeighbors);
+
+        if (theNeighbors.get(getDirection()) == Terrain.CROSSWALK) {
+            dir = getDirection();
+        } else {
+            
+
+            if (list.size() == 0) {
+                dir = getDirection().reverse();
+            } else {
+                if (list.contains(getDirection())) {
+                    dir = getDirection();
+                } else if (list.contains(getDirection().left())) {
+                    dir = getDirection().left();
+                } else if (list.contains(getDirection().right())) {
+                    dir = getDirection().right();
+                } else {
+                    final Random rand = new Random();
+                    final int num = rand.nextInt(list.size());
+                    dir = list.get(num);
+                }
+            }
+        }
+        
+        for (Direction direct : theNeighbors.keySet()) {
+            if (theNeighbors.get(direct) == Terrain.TRAIL 
+                            && direct != getDirection().reverse()) {
+                dir = direct;
+                break;
+            }
+        }
+        return dir;
+  
+    }
+    
+    public ArrayList<Direction> available(final Map<Direction, Terrain> theNeighbors) {
+        final ArrayList<Direction> list = new ArrayList<Direction>();
+        
+        for (Direction dir : theNeighbors.keySet()) {
+            if (theNeighbors.get(dir) == Terrain.CROSSWALK 
+                            || theNeighbors.get(dir) == Terrain.LIGHT
+                            || theNeighbors.get(dir) == Terrain.STREET 
+                            || theNeighbors.get(dir)  == Terrain.TRAIL) {
+                if (dir != getDirection().reverse()) {
+                    if (dir != getDirection().reverse()) {
+                        list.add(dir);
+                    }
+                }
+
+            }
+        }
+        return list;
+        
+    }
+
+}

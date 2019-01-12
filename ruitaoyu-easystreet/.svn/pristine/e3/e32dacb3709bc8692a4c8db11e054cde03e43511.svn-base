@@ -1,0 +1,83 @@
+/*
+ * TCSS 305 Assignment 3 - Easy Street
+ */
+package model;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Random;
+
+/**
+ * This is the car class that extended from the AbstractVehivle class.
+ * 
+ * @author Ruitao YU
+ * @version October 18 2017
+ *
+ */
+public class Car extends AbstractVehicle {
+    
+    /** Death time of the truck. */
+    public static final int MY_TIME = 10;
+    
+    /**
+     * This is the constructor of the car class.
+     * 
+     * @param theX the x coordinate of car's location.
+     * @param theY the y coordinate of car's location.
+     * @param theDir the current direction of car.
+     */
+    public Car(final int theX, final int theY, final Direction theDir) {
+        super(theX, theY, theDir, MY_TIME);
+
+    }
+
+    @Override
+    public boolean canPass(final Terrain theTerrain, final Light theLight) {
+        final boolean pass;
+        if ((theTerrain == Terrain.CROSSWALK && theLight == Light.GREEN)
+            || theTerrain == Terrain.STREET 
+            || (theTerrain == Terrain.LIGHT && theLight != Light.RED)) {
+            pass = true;
+        } else {
+            pass = false;
+        }
+        return pass;
+    }
+    
+    @Override
+    public Direction chooseDirection(final Map<Direction, Terrain> theNeighbors) {
+        final Direction dir;
+        final ArrayList<Direction> list = new ArrayList<Direction>();
+
+        if (theNeighbors.get(getDirection()) == Terrain.CROSSWALK) {
+            dir = getDirection();
+        } else {
+            //list = available(theNeighbors);
+            for (final Direction direction : theNeighbors.keySet()) {
+                if ((theNeighbors.get(direction) == Terrain.CROSSWALK 
+                                ||  theNeighbors.get(direction) == Terrain.LIGHT
+                                || theNeighbors.get(direction) == Terrain.STREET)
+                                && direction != getDirection().reverse()) {
+                    list.add(direction);
+                }
+            }
+            
+            if  (list.isEmpty()) {
+                dir = getDirection().reverse();
+            } else {
+                if (list.contains(getDirection())) {
+                    dir = getDirection();
+                } else if (list.contains(getDirection().left())) {
+                    dir = getDirection().left();
+                } else if (list.contains(getDirection().right())) {
+                    dir = getDirection().right();
+                }  else {
+                    final Random rand = new Random();
+                    final int num = rand.nextInt(list.size());
+                    dir = list.get(num);
+                }
+            }
+        }
+        return dir;
+    }
+}

@@ -1,0 +1,57 @@
+package model;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Random;
+
+public class Atv extends AbstractVehicle {
+    
+    /** Death time of the truck. */
+    public static final int MY_TIME = 20;
+
+    public Atv(int theX, int theY, Direction theDir) {
+        super(theX, theY, theDir, MY_TIME);
+
+    }
+
+    @Override
+    public boolean canPass(final Terrain theTerrain, final Light theLight) {
+        final boolean pass;
+        if (theTerrain != Terrain.WALL) {
+            pass = true;
+        } else {
+            pass = false;
+        }
+        return pass;
+    }
+    
+    @Override
+    public Direction chooseDirection(final Map<Direction, Terrain> theNeighbors) {
+        Direction dir;
+        final ArrayList<Direction> list;
+        list = available(theNeighbors);
+        
+        do {
+            final Random rand = new Random();
+            final int num = rand.nextInt(list.size());
+            dir = list.get(num);
+        } while (dir == getDirection().reverse());
+        
+        return dir;
+    }
+    
+    public ArrayList<Direction> available(final Map<Direction, Terrain> theNeighbors) {
+        final ArrayList<Direction> list = new ArrayList<Direction>();
+        
+        for (Direction dir : theNeighbors.keySet()) {
+            if (theNeighbors.get(dir) != Terrain.WALL) {
+                if (dir != getDirection().reverse()) {
+                    list.add(dir);
+                }
+            }
+        }
+        return list;
+        
+    }
+
+}

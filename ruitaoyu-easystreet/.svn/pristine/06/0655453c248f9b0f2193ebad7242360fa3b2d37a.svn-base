@@ -1,0 +1,158 @@
+package model;
+
+import java.util.Map;
+
+public abstract class AbstractVehicle implements Vehicle {
+    
+    private int myX;
+    
+    private int myY;
+    
+    private int myPoke;
+    
+    private final int myDefaultX;
+    
+    private final int myDefaultY;
+    
+    private Direction myDefaultDir;
+    
+    private Direction myDir;
+    
+    private final int myDeathTime;
+    
+    private boolean isAlive;
+    
+
+    
+    /**
+     * 
+     * @param theX 
+     * @param theY 
+     * @param theDir 
+     * @param theDeathTime 
+     */
+    public AbstractVehicle(final int theX, final int theY, final Direction theDir,
+            final int theDeathTime) {
+        myX = theX;
+        myY = theY;
+        myDefaultX = theX;
+        myDefaultY = theY;
+        myDefaultDir = theDir;
+        myDir = theDir;
+        myDeathTime = theDeathTime;
+        isAlive = true;
+    }
+
+    @Override
+    public boolean canPass(final Terrain theTerrain, final Light theLight) {
+        // TODO Auto-generated method stub
+        return true;
+    }
+
+    @Override
+    public Direction chooseDirection(final Map<Direction, Terrain> theNeighbors) {
+        // TODO Auto-generated method stub
+        return Direction.random();
+    }
+
+    @Override
+    public void collide(final Vehicle theOther) {
+        
+        if (isAlive() && theOther.isAlive() 
+                        && myDeathTime > theOther.getDeathTime()) {
+            
+            myPoke = myDeathTime;
+            isAlive = false;
+            
+        }
+    }
+
+    @Override
+    public final int getDeathTime() {
+        // TODO Auto-generated method stub
+        return myDeathTime;
+    }
+
+    @Override
+    public final String getImageFileName() {
+        final String name;
+        if (isAlive()) {
+            name = getClass().getSimpleName().toLowerCase()  + ".gif";
+        } else {
+            name = getClass().getSimpleName().toLowerCase()  + "_dead.gif";
+        }
+        return name;
+    }
+
+    @Override
+    public final Direction getDirection() {
+        // TODO Auto-generated method stub
+        return myDir;
+    }
+
+    @Override
+    public final int getX() {
+        // TODO Auto-generated method stub
+        return myX;
+    }
+
+    @Override
+    public final int getY() {
+        // TODO Auto-generated method stub
+        return myY;
+    }
+
+    @Override
+    public final boolean isAlive() {
+        // TODO Auto-generated method stub
+        return isAlive;
+    }
+
+    @Override
+    public final void poke() {
+        myPoke--;
+        
+        if (myPoke == 0) {
+            isAlive = true;
+            myDir = Direction.random();
+        }
+
+    }
+
+    @Override
+    public final void reset() {
+        myX = myDefaultX;
+        myY = myDefaultY;
+        myDir = myDefaultDir;
+    }
+
+    @Override
+    public final void setDirection(final Direction theDir) {
+        myDir = theDir;
+    }
+
+    @Override
+    public final void setX(final int theX) {
+        myX = theX;
+    }
+
+    @Override
+    public final void setY(final int theY) {
+        myY = theY;
+    }
+    
+    @Override
+    public String toString() {
+        // Create a String builder and  if as return String.
+        final StringBuilder builder = new StringBuilder(128);
+        builder.append(getClass().getSimpleName());
+        builder.append(" (");
+        builder.append(myX);
+        builder.append(", ");
+        builder.append(myY);
+        builder.append(") ");
+        
+        return builder.toString();
+    }
+
+}
